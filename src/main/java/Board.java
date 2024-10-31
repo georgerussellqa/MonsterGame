@@ -44,13 +44,7 @@ public class Board {
                 int finalI = i;
                 int finalJ = j;
                 System.out.print(
-                        playerRow == i && playerCol == j && this.gameState == -1 ? "☠\uFE0F" :
-                                playerRow == i && playerCol == j && this.gameState == 1 ? "\uD83D\uDC8E" :
-                                        gameBoard[i][j] instanceof Monster ? "\uD83D\uDC79" :
-                                                gameBoard[i][j] instanceof Treasure ? "\uD83D\uDC8E" :
-                                                    path.get(0)[0] == j && path.get(0)[1] == i ? "\uD83D\uDFEA" :
-                                                        path.stream().anyMatch(o -> (o[0] == finalI && o[1] == finalJ)) && this.gameState == -1 ? "\uD83D\uDFE5" :
-                                                            path.stream().anyMatch(o -> (o[0] == finalI && o[1] == finalJ)) ? "\uD83D\uDFE9" : "⬜");
+                        playerRow == i && playerCol == j && this.gameState == -1 ? "☠\uFE0F" : playerRow == i && playerCol == j && this.gameState == 1 ? "\uD83D\uDC8E" : gameBoard[i][j] instanceof Monster ? "\uD83D\uDC79" : gameBoard[i][j] instanceof Treasure ? "\uD83D\uDC8E" : path.get(0)[0] == j && path.get(0)[1] == i ? "\uD83D\uDFEA" : path.stream().anyMatch(o -> (o[0] == finalI && o[1] == finalJ)) && this.gameState == -1 ? "\uD83D\uDFE5" : path.stream().anyMatch(o -> (o[0] == finalI && o[1] == finalJ)) ? "\uD83D\uDFE9" : "⬜");
             }
             System.out.print("\n");
         }

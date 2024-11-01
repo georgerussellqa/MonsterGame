@@ -1,7 +1,7 @@
 import java.util.Random;
 
 public class Monster implements Square {
-    private String[] greetings = {
+    private final String[] greetings = {
             "WooHoo! It's mr schleb here... Get eaten nerd!",
             "Roarrrrr! Nom nom nom! (buuuurp)",
             "UwU :3",
@@ -14,10 +14,9 @@ public class Monster implements Square {
         return greeting;
     }
 
-    private String greeting;
+    private final String greeting;
 
     public Monster() {
-        Random randGen = new Random();
         this.greeting = greetings[new Random().nextInt(greetings.length)];
     }
 

@@ -15,15 +15,25 @@ public class Board {
     private int treasureRow;
     private int treasureCol;
 
-    private final ArrayList<int[]> path = new ArrayList<>();
+    private final ArrayList<int[]> playerPath = new ArrayList<>();
 
-    public Board(Integer size, Integer numMonsters) {
-        this.boardSize = size;
-        this.gameBoard = new Square[size][size];
+    public Board() {
+        Scanner input = new Scanner(System.in);
+
+        System.out.print("Enter board size (size x size grid) >>> ");
+        int boardSize = input.nextInt();
+
+        System.out.print("Enter number of monsters to spawn >>> ");
+        int numMonsters = input.nextInt();
+
+        this.boardSize = boardSize;
+        this.gameBoard = new Square[boardSize][boardSize];
+
         generateMonsters(numMonsters);
         generatePlayer();
         generateTreasure();
-        path.add(new int[] {playerRow, playerCol});
+
+        playerPath.add(new int[] {playerRow, playerCol});
     }
 
     public void startGame() {
@@ -34,21 +44,61 @@ public class Board {
         do {
             System.out.print("Make a move (U, R, D, L) >>> ");
             String in = input.next();
+
             msg = this.movePlayer(in);
             System.out.println(this);
             System.out.println(msg);
         } while (this.getGameState() != 1 && this.getGameState() != -1);
 
+        displayFinalGrid();
+
+    }
+
+    private void displayFinalGrid() {
+        StringBuilder sb = new StringBuilder();
+
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
                 int finalI = i;
                 int finalJ = j;
-                System.out.print(
-                        playerRow == i && playerCol == j && this.gameState == -1 ? "☠\uFE0F" : playerRow == i && playerCol == j && this.gameState == 1 ? "\uD83D\uDC8E" : gameBoard[i][j] instanceof Monster ? "\uD83D\uDC79" : gameBoard[i][j] instanceof Treasure ? "\uD83D\uDC8E" : path.get(0)[0] == j && path.get(0)[1] == i ? "\uD83D\uDFEA" : path.stream().anyMatch(o -> (o[0] == finalI && o[1] == finalJ)) && this.gameState == -1 ? "\uD83D\uDFE5" : path.stream().anyMatch(o -> (o[0] == finalI && o[1] == finalJ)) ? "\uD83D\uDFE9" : "⬜");
+
+                // Display death symbol on monster that killed you
+                if (playerRow == i && playerCol == j && this.gameState == -1) {
+                    sb.append("☠\uFE0F");
+
+                // Displays diamond if you find the treasure
+                } else if (playerRow == i && playerCol == j && this.gameState == 1) {
+                    sb.append("\uD83D\uDC8E");
+
+                // Displays monster symbols
+                } else if (gameBoard[i][j] instanceof Monster) {
+                    sb.append("\uD83D\uDC79");
+
+                // Displays treasure symbol
+                } else if (gameBoard[i][j] instanceof Treasure) {
+                    sb.append("\uD83D\uDC8E");
+
+                // Display purple square on player's starting point
+                } else if (playerPath.get(0)[0] == i && playerPath.get(0)[1] == j) {
+                    sb.append("\uD83D\uDFEA");
+
+                // Display path if you die in red
+                } else if (playerPath.stream().anyMatch(o -> (o[0] == finalI && o[1] == finalJ)) && this.gameState == -1) {
+                    sb.append("\uD83D\uDFE5");
+
+                // Display path if you win in green
+                } else if (playerPath.stream().anyMatch(o -> (o[0] == finalI && o[1] == finalJ))) {
+                    sb.append("\uD83D\uDFE9");
+
+                // Fill in board with white squares
+                } else {
+                    sb.append("⬜");
+                }
             }
-            System.out.print("\n");
+            sb.append("\n");
         }
 
+        System.out.println(sb);
     }
 
     public String movePlayer(String direction) {
@@ -83,11 +133,14 @@ public class Board {
             return 0;
         }
 
+        // If player lands on treasure, set game state to 1 (win)
         if (gameBoard[newRow][newCol] instanceof Treasure) {
             gameState = 1;
             playerRow = newRow;
             playerCol = newCol;
             return 1;
+
+        // If player lands on a monster, set game state to -1 (loss)
         } else if (gameBoard[newRow][newCol] instanceof Monster) {
             gameState = -1;
             playerRow = newRow;
@@ -95,11 +148,15 @@ public class Board {
             return -1;
         }
 
+        // Move player instance
         gameBoard[newRow][newCol] = gameBoard[playerRow][playerCol];
         gameBoard[playerRow][playerCol] = null;
+
+
+        // Add new player position, and add to their path, then return game state 0 (no change)
         playerRow = newRow;
         playerCol = newCol;
-        path.add(new int[] {newRow, newCol});
+        playerPath.add(new int[] {newRow, newCol});
 
         return 0;
 
@@ -158,20 +215,19 @@ public class Board {
                 || gameBoard[row][col] instanceof Treasure);
     }
 
-    @Override
-    public String toString() {
-        /*System.out.println("|-------------------|");*/
-        for (int i = 0; i < boardSize; i++) {
-           for (int j = 0; j < boardSize; j++) {
-               System.out.print(gameBoard[i][j] != null ? gameBoard[i][j] /*+ " | "*/ : "⬜"/* | "*/);
-           }
-            System.out.print("\n");
-           /*System.out.print("\n|-------------------|\n");*/
-        }
-       return "";
-    }
-
     public int getGameState() {
         return gameState;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < boardSize; i++) {
+            for (int j = 0; j < boardSize; j++) {
+                sb.append(gameBoard[i][j] != null ? gameBoard[i][j]: "⬜");
+            }
+            sb.append("\n");
+        }
+        return sb.toString();
     }
 }
